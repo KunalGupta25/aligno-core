@@ -38,6 +38,17 @@ class Ride(models.Model):
     def __str__(self):
         return f"{self.start_location} → {self.destination} ({self.status})"
     
+    def complete_ride(self, user):
+        if self.status == 'completed':
+            raise ValueError("Ride already completed")
+
+        if user != self.creator and not self.participants.filter(id=user.id).exists():
+            raise ValueError("User not allowed to complete this ride")
+
+        self.status = 'completed'
+        self.save()
+
+    
 class RideJoinRequest(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending'),
